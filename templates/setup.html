@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% from "macros.html" import ic %}
+{% block title %}Payment profile - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass" style="max-width:680px;margin:0 auto">
+  <div class="hero"><div class="logo">{{ ic('wallet') }}</div><div><h1>Payment profile</h1><div class="mut">Money goes straight to your UPI id. Your mailbox is only used to confirm bank credit alerts.</div></div></div>
+  <form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}">
+    <div class="grid g2">
+      <div><label>Business or display name</label><input name="biz_name" value="{{ u.biz_name or '' }}" maxlength="60" placeholder="Shown on the payment page"></div>
+      <div><label>Mobile number</label><input name="phone" value="{{ u.phone or '' }}" inputmode="numeric" required placeholder="10 digit number"></div>
+      <div><label>Email</label><input name="email" type="email" value="{{ u.email or '' }}" required></div>
+      <div><label>UPI id</label><input name="upi_id" value="{{ u.upi_id or '' }}" required placeholder="name@bank"></div>
+      <div><label>Gmail that receives bank alerts</label><input name="gmail" type="email" value="{{ u.gmail or '' }}" required placeholder="you@gmail.com"></div>
+      <div><label>Google app password</label><input name="app_password" type="password" autocomplete="off" placeholder="{{ 'Saved. Leave empty to keep' if u.app_pw_enc else '16 letter app password' }}" {{ '' if u.app_pw_enc else 'required' }}></div>
+    </div>
+    <div class="notice" style="margin-top:16px">{{ ic('shield') }}<div class="sm">Create the app password at <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">Google app passwords</a> (2 step verification must be on) and turn on bank email alerts for credits on your UPI account. The password is encrypted before it is stored and is only used to search for one UTR at a time.</div></div>
+    <button class="btn block" type="submit">{{ ic('check') }} Save and connect mailbox</button>
+  </form>
+</div>
+{% endblock %}

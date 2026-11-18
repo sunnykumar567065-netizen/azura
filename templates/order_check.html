@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% from "macros.html" import ic, pill %}
+{% block title %}Order check - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass center">
+  <div class="hero"><div class="logo">{{ ic('search') }}</div><div><h1>Order check</h1><div class="mut">See the live status of an order.</div></div></div>
+  <form method="get"><label>Order id</label><input name="order_id" value="{{ oid }}" required style="text-transform:uppercase"><button class="btn block" type="submit">{{ ic('search') }} Check</button></form>
+  {% if o %}<div style="margin-top:18px"><table class="tbl">
+    <tr><td class="mut">Status</td><td>{{ pill(o.status) }}</td></tr>
+    <tr><td class="mut">Amount</td><td>Rs. {{ o.amount }}</td></tr>
+    <tr><td class="mut">Merchant</td><td>{{ o.user.biz_name or o.user.username }}</td></tr>
+    <tr><td class="mut">Created</td><td>{{ o.created_at|ist }}</td></tr>
+    {% if o.paid_at %}<tr><td class="mut">Paid</td><td>{{ o.paid_at|ist }}</td></tr>{% endif %}
+  </table>{% if o.status == 'pending' %}<a class="btn ghost sm" style="margin-top:12px" href="{{ url_for('payment', oid=o.order_id) }}">{{ ic('qr') }} Open payment</a>{% endif %}</div>{% endif %}
+</div>
+{% endblock %}

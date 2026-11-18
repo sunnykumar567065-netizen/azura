@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% from "macros.html" import ic %}
+{% block title %}Chat - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass chat">
+  <h2>{{ ic('chat') }} {{ title }}</h2>
+  <div id="msgs" data-uid="{{ uid }}" data-admin="{{ 1 if me.role == 'admin' else 0 }}" data-csrf="{{ csrf }}"></div>
+  <form id="cform" autocomplete="off"><input id="cbody" maxlength="1000" placeholder="Type a message" aria-label="Message"><button class="btn" type="submit">{{ ic('send') }} Send</button></form>
+</div>
+{% endblock %}

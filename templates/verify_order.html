@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% from "macros.html" import ic %}
+{% block title %}Verify order - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass center">
+  <div class="hero"><div class="logo">{{ ic('check') }}</div><div><h1>Verify order</h1><div class="mut">Enter your order id and the 12 digit UTR.</div></div></div>
+  <form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}">
+    <label>Order id</label><input name="order_id" value="{{ oid }}" required style="text-transform:uppercase">
+    <label>UTR / transaction id</label><input name="utr" inputmode="numeric" maxlength="14" required placeholder="12 digit UTR">
+    <button class="btn block" type="submit">{{ ic('check') }} Verify payment</button>
+  </form>
+</div>
+{% endblock %}

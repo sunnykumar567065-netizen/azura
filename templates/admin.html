@@ -1,0 +1,40 @@
+{% extends "base.html" %}{% from "macros.html" import ic, copy %}
+{% block title %}Admin - {{ site }}{% endblock %}
+{% block body %}
+<div class="hero"><div class="logo">{{ ic('shield') }}</div><div><h1>Admin</h1><div class="mut">Control users, orders, codes and data.</div></div></div>
+<div class="grid g4">
+  <div class="glass stat"><div class="k">{{ ic('users') }} Users</div><div class="v">{{ s.users }}</div></div>
+  <div class="glass stat"><div class="k">{{ ic('list') }} Orders</div><div class="v">{{ s.orders }}</div></div>
+  <div class="glass stat"><div class="k">{{ ic('check') }} Paid / pending</div><div class="v">{{ s.paid }} / {{ s.pending }}</div></div>
+  <div class="glass stat"><div class="k">{{ ic('rupee') }} Volume</div><div class="v">Rs. {{ '{:,.0f}'.format(s.volume) }}</div></div>
+</div>
+<div class="row" style="margin:16px 0">
+  <a class="btn" href="{{ url_for('admin_users') }}">{{ ic('users') }} Users</a>
+  <a class="btn" href="{{ url_for('admin_orders') }}">{{ ic('list') }} Orders</a>
+  <a class="btn" href="{{ url_for('admin_chat') }}">{{ ic('chat') }} Chats{% if unread %} ({{ unread }}){% endif %}</a>
+  <a class="btn ghost" href="{{ url_for('admin_export', kind='db') }}">{{ ic('db') }} Download database</a>
+  <a class="btn ghost" href="{{ url_for('admin_export', kind='json') }}">{{ ic('download') }} Export JSON</a>
+</div>
+<div class="grid g2">
+  <div class="glass">
+    <h2>{{ ic('gift') }} Referral codes</h2>
+    <form method="post" action="{{ url_for('admin_code') }}"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="act" value="create">
+      <div class="row"><input class="grow" name="code" placeholder="Custom code (empty = random)"><input name="max_uses" type="number" min="0" value="1" style="width:110px" title="0 = unlimited" aria-label="Max uses"></div>
+      <input name="note" placeholder="Note" style="margin-top:8px"><button class="btn block" type="submit">{{ ic('plus') }} Create code</button>
+    </form>
+    <div class="wrap" style="margin-top:14px"><table class="tbl"><tr><th>Code</th><th>Uses</th><th></th></tr>
+    {% for c in codes %}<tr><td class="mono">{{ c.code }} {{ copy(c.code) }}<div class="mut sm">{{ c.note or '' }}</div></td><td>{{ c.uses }}/{{ c.max_uses or 'unlimited' }}</td>
+      <td><div class="row">
+      <form method="post" action="{{ url_for('admin_code') }}"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="id" value="{{ c.id }}"><input type="hidden" name="act" value="toggle"><button class="btn ghost sm">{{ 'Disable' if c.active else 'Enable' }}</button></form>
+      <form method="post" action="{{ url_for('admin_code') }}" data-confirm="Delete this code?"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="id" value="{{ c.id }}"><input type="hidden" name="act" value="delete"><button class="btn danger sm" title="Delete">{{ ic('trash') }}</button></form></div></td></tr>
+    {% else %}<tr><td colspan="3" class="empty">No codes yet.</td></tr>{% endfor %}</table></div>
+  </div>
+  <div class="grid" style="align-content:start">
+    <div class="glass"><h2>{{ ic('bell') }} Announcement</h2>
+      <form method="post" action="{{ url_for('admin_notice') }}"><input type="hidden" name="_csrf" value="{{ csrf }}"><input name="text" value="{{ notice }}" maxlength="300" placeholder="Shown on every dashboard. Empty to hide."><button class="btn block" type="submit">{{ ic('check') }} Save</button></form></div>
+    <div class="glass"><h2>{{ ic('link') }} All links</h2>
+      {% for n, u in [('Login', base ~ '/login'), ('Register', base ~ '/register'), ('Payment', base ~ '/payment/ORDER_ID'), ('Verify order', base ~ '/verify_order'), ('Order check', base ~ '/order_check'), ('API create order', base ~ '/api/create_order'), ('API order status', base ~ '/api/order_status/ORDER_ID'), ('API verify', base ~ '/api/verify')] %}
+      <div class="mut sm">{{ n }}</div><div class="kv" style="margin-bottom:8px"><code>{{ u }}</code>{{ copy(u) }}</div>{% endfor %}</div>
+  </div>
+</div>
+{% endblock %}

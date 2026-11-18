@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% from "macros.html" import ic, pill %}
+{% block title %}History - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass">
+  <div class="row" style="margin-bottom:14px"><h2 class="grow" style="margin:0">{{ ic('list') }} Payment history</h2>
+    <a class="btn ghost sm" href="{{ url_for('history_csv') }}">{{ ic('download') }} CSV</a></div>
+  <div class="row" style="margin-bottom:12px">
+    {% for s in ['', 'paid', 'pending', 'expired', 'cancelled'] %}<a class="btn sm {{ '' if st == s else 'ghost' }}" href="{{ url_for('history', status=s) }}">{{ s or 'all' }}</a>{% endfor %}
+  </div>
+  {% if orders %}<div class="wrap"><table class="tbl"><tr><th>Order</th><th>Amount</th><th>Status</th><th>UTR</th><th>Note</th><th>Created</th><th>Paid</th></tr>
+  {% for o in orders %}<tr><td><a href="{{ url_for('payment', oid=o.order_id) }}">{{ o.order_id }}</a></td><td>Rs. {{ o.amount }}</td><td>{{ pill(o.status) }}</td><td class="mono">{{ o.utr or '-' }}</td><td>{{ o.note or '-' }}</td><td>{{ o.created_at|ist }}</td><td>{{ o.paid_at|ist }}</td></tr>{% endfor %}</table></div>
+  {% else %}<div class="empty">Nothing here yet.</div>{% endif %}
+</div>
+{% endblock %}

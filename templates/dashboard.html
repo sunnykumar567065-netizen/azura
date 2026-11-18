@@ -1,0 +1,50 @@
+{% extends "base.html" %}{% from "macros.html" import ic, pill, copy %}
+{% block title %}Dashboard - {{ site }}{% endblock %}
+{% block body %}
+{% if notice %}<div class="notice">{{ ic('bell') }}<div>{{ notice }}</div></div>{% endif %}
+<div class="hero"><div class="logo">{{ ic('home') }}</div><div><h1>Hello, {{ me.username }}</h1><div class="mut">{{ me.biz_name or 'Your gateway' }}{% if me.upi_id %} &middot; {{ me.upi_id }}{% endif %}</div></div></div>
+{% if not me.setup_done %}<div class="flash err">Finish your <a href="{{ url_for('setup') }}">payment profile</a> to start receiving payments.</div>{% endif %}
+<div class="grid g4">
+  <div class="glass stat"><div class="k">{{ ic('rupee') }} Received</div><div class="v">Rs. {{ '{:,.2f}'.format(stats.volume) }}</div></div>
+  <div class="glass stat"><div class="k">{{ ic('check') }} Paid orders</div><div class="v">{{ stats.paid }}</div></div>
+  <div class="glass stat"><div class="k">{{ ic('clock') }} Pending</div><div class="v">{{ stats.pending }}</div></div>
+  <div class="glass stat"><div class="k">{{ ic('list') }} All orders</div><div class="v">{{ stats.total }}</div></div>
+</div>
+<div class="grid g2" style="margin-top:16px">
+  <div class="glass">
+    <h2>{{ ic('qr') }} Create payment link</h2>
+    <form method="post" action="{{ url_for('order_create') }}"><input type="hidden" name="_csrf" value="{{ csrf }}">
+      <label>Amount (Rs.)</label><input name="amount" type="number" min="1" max="100000" step="0.01" required placeholder="499">
+      <label>Note (optional)</label><input name="note" maxlength="120" placeholder="Bot subscription">
+      <button class="btn block" type="submit">{{ ic('qr') }} Generate QR</button>
+    </form>
+    <p class="mut sm">The QR carries the exact amount. Payment is confirmed only when the UTR and the amount match your bank credit alert.</p>
+  </div>
+  <div class="glass">
+    <h2>{{ ic('key') }} API key</h2>
+    <div class="kv"><code>{{ me.api_key }}</code>{{ copy(me.api_key) }}</div>
+    <form method="post" action="{{ url_for('key_regen') }}" data-confirm="Old key will stop working. Continue?" style="margin-top:12px"><input type="hidden" name="_csrf" value="{{ csrf }}">
+      <button class="btn ghost sm" type="submit">{{ ic('refresh') }} Generate new key</button></form>
+    <p class="mut sm" style="margin-top:12px">Send it in the <code>X-API-Key</code> header. Callbacks to your server are signed with this key (HMAC SHA256 in <code>X-Signature</code>).</p>
+  </div>
+</div>
+<div class="glass" style="margin-top:16px">
+  <h2>{{ ic('link') }} Your links</h2>
+  {% set links = [('Login', base ~ '/login'), ('Register', base ~ '/register'), ('Payment page', base ~ '/payment/ORDER_ID'), ('Verify order', base ~ '/verify_order'), ('Order check', base ~ '/order_check'), ('API: create order (POST)', base ~ '/api/create_order'), ('API: order status (GET)', base ~ '/api/order_status/ORDER_ID'), ('API: verify UTR (POST)', base ~ '/api/verify')] %}
+  <div class="grid g2">{% for n, u in links %}<div><div class="mut sm">{{ n }}</div><div class="kv"><code>{{ u }}</code>{{ copy(u) }}</div></div>{% endfor %}</div>
+</div>
+<div class="grid g2" style="margin-top:16px">
+  <div class="glass">
+    <h2>{{ ic('gift') }} Referral codes</h2>
+    <p class="mut sm">Each code works once. Share it so a new member can register.</p>
+    {% for c in codes %}<div class="kv" style="margin-bottom:8px"><code>{{ c.code }}</code>{{ copy(c.code) }}<span class="pill {{ 'paid' if c.active and (c.max_uses == 0 or c.uses < c.max_uses) else 'expired' }}">{{ 'unused' if c.active and (c.max_uses == 0 or c.uses < c.max_uses) else 'used' }}</span></div>{% else %}<div class="empty">No codes yet.</div>{% endfor %}
+    <form method="post" action="{{ url_for('referral_new') }}"><input type="hidden" name="_csrf" value="{{ csrf }}"><button class="btn ghost sm" type="submit">{{ ic('plus') }} New code</button></form>
+  </div>
+  <div class="glass">
+    <h2>{{ ic('list') }} Recent orders</h2>
+    {% if orders %}<div class="wrap"><table class="tbl"><tr><th>Order</th><th>Amount</th><th>Status</th></tr>
+    {% for o in orders %}<tr><td><a href="{{ url_for('payment', oid=o.order_id) }}">{{ o.order_id }}</a></td><td>Rs. {{ o.amount }}</td><td>{{ pill(o.status) }}</td></tr>{% endfor %}</table></div>
+    {% else %}<div class="empty">No orders yet. Create your first payment link.</div>{% endif %}
+  </div>
+</div>
+{% endblock %}

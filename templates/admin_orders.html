@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% from "macros.html" import ic, pill %}
+{% block title %}Orders - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass">
+  <div class="row" style="margin-bottom:14px"><h2 class="grow" style="margin:0">{{ ic('list') }} All orders</h2>
+    <form method="get" class="row"><input name="q" value="{{ q }}" placeholder="Order id, UTR, merchant" style="width:220px">
+      <select name="status" style="width:140px" aria-label="Status"><option value="">All</option>{% for s in ['paid', 'pending', 'expired', 'cancelled'] %}<option value="{{ s }}" {{ 'selected' if st == s }}>{{ s }}</option>{% endfor %}</select>
+      <button class="btn sm">{{ ic('search') }} Filter</button></form></div>
+  <div class="wrap"><table class="tbl"><tr><th>Order</th><th>Merchant</th><th>Amount</th><th>Status</th><th>UTR</th><th>Created</th><th></th></tr>
+  {% for o in orders %}<tr><td><a href="{{ url_for('payment', oid=o.order_id) }}">{{ o.order_id }}</a></td><td>{{ o.user.username }}</td><td>Rs. {{ o.amount }}</td><td>{{ pill(o.status) }}</td><td class="mono">{{ o.utr or '-' }}</td><td class="sm">{{ o.created_at|ist }}</td>
+    <td><div class="row">
+    {% if o.status != 'paid' %}<form method="post" action="{{ url_for('admin_order_act', oid=o.id, act='paid') }}" data-confirm="Mark as paid without bank check?"><input type="hidden" name="_csrf" value="{{ csrf }}"><button class="btn ghost sm">Mark paid</button></form>{% endif %}
+    {% if o.status == 'pending' %}<form method="post" action="{{ url_for('admin_order_act', oid=o.id, act='cancel') }}"><input type="hidden" name="_csrf" value="{{ csrf }}"><button class="btn danger sm">Cancel</button></form>{% endif %}
+    </div></td></tr>
+  {% else %}<tr><td colspan="7" class="empty">No orders found.</td></tr>{% endfor %}</table></div>
+</div>
+{% endblock %}

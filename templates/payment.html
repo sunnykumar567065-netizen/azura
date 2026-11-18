@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% from "macros.html" import ic, pill %}
+{% block title %}Payment - {{ site }}{% endblock %}
+{% block body %}
+{% if not o %}
+<div class="glass center"><div class="hero"><div class="logo">{{ ic('qr') }}</div><div><h1>Payment</h1><div class="mut">Open a payment by order id.</div></div></div>
+  <form method="get" action="{{ url_for('payment') }}"><label>Order id</label><input name="order_id" placeholder="ORD1A2B3C4D5E6F" required style="text-transform:uppercase"><button class="btn block" type="submit">{{ ic('search') }} Open</button></form></div>
+{% else %}
+<div class="glass pay">
+  <div class="mut">Pay to {{ o.user.biz_name or o.user.username }}</div>
+  <div class="amount">Rs. {{ o.amount }}</div>
+  <div style="margin:6px 0 14px">{{ pill(o.status) }} <span class="mono mut">{{ o.order_id }}</span></div>
+  {% if o.status == 'pending' %}
+    <div class="qrbox"><img alt="UPI QR code for Rs. {{ o.amount }}" src="{{ qr }}"></div>
+    <p class="mut sm">Scan with any UPI app. The amount is already filled in. Do not change it.</p>
+    <div class="steps"><span>Scan and pay</span><span>Copy the 12 digit UTR</span><span>Verify below</span></div>
+    <a class="btn ghost sm" href="{{ uri }}">{{ ic('wallet') }} Open in UPI app</a>
+    <form method="post" action="{{ url_for('verify_order') }}" style="text-align:left;margin-top:14px"><input type="hidden" name="_csrf" value="{{ csrf }}"><input type="hidden" name="order_id" value="{{ o.order_id }}">
+      <label>UTR / transaction id</label><input name="utr" inputmode="numeric" maxlength="14" required placeholder="12 digit UTR">
+      <button class="btn block" type="submit">{{ ic('check') }} Verify payment</button></form>
+    <p class="mut sm">This link expires {{ o.expires_at|ist }} IST.</p>
+  {% elif o.status == 'paid' %}
+    <div class="logo" style="margin:10px auto;width:72px;height:72px;border-radius:24px">{{ ic('check') }}</div>
+    <h2 style="justify-content:center">Payment received</h2>
+    <p class="mut">UTR <span class="mono">{{ o.utr or '-' }}</span><br>{{ o.paid_at|ist }}</p>
+  {% else %}
+    <p class="mut">This order is {{ o.status }}. Ask the merchant for a new link. If you already paid, share your UTR with the merchant.</p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

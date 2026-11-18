@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% from "macros.html" import ic %}
+{% block title %}Register - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass center">
+  <div class="hero"><div class="logo">{{ ic('user') }}</div><div><h1>Create account</h1><div class="mut">A referral code is required.</div></div></div>
+  <form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}">
+    <label for="u">Username</label><input id="u" name="username" autocomplete="username" required minlength="3" maxlength="24">
+    <label for="p">Password</label><input id="p" name="password" type="password" autocomplete="new-password" required minlength="8">
+    <label for="r">Referral code</label><input id="r" name="referral" required placeholder="AZ-XXXXXXXX" style="text-transform:uppercase">
+    <button class="btn block" type="submit">{{ ic('gift') }} Register</button>
+  </form>
+  <p class="mut sm">No code? Ask a member or message <a href="https://t.me/{{ tg }}" target="_blank" rel="noopener">@{{ tg }}</a>. Already registered? <a href="{{ url_for('login') }}">Sign in</a>.</p>
+</div>
+{% endblock %}

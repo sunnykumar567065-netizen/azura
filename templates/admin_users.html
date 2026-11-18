@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% from "macros.html" import ic, pill %}
+{% block title %}Users - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass">
+  <div class="row" style="margin-bottom:14px"><h2 class="grow" style="margin:0">{{ ic('users') }} Users</h2>
+    <form method="get" class="row"><input name="q" value="{{ q }}" placeholder="Search name, email, phone, UPI" style="width:260px"><button class="btn sm">{{ ic('search') }} Search</button></form></div>
+  <div class="wrap"><table class="tbl"><tr><th>User</th><th>Contact</th><th>UPI</th><th>Received</th><th>Joined</th><th>Actions</th></tr>
+  {% for u in users %}<tr>
+    <td><b>{{ u.username }}</b> {% if u.role == 'admin' %}{{ pill('admin') }}{% endif %}{% if u.banned %}<span class="pill banned">banned</span>{% endif %}<div class="mut sm">via {{ u.referred_by or '-' }}</div></td>
+    <td class="sm">{{ u.phone or '-' }}<br>{{ u.email or '-' }}<br>{{ 'mailbox connected' if u.app_pw_enc else 'mailbox not connected' }}</td>
+    <td class="mono">{{ u.upi_id or '-' }}</td><td>Rs. {{ vol.get(u.id, 0) }}</td><td class="sm">{{ u.created_at|ist }}</td>
+    <td><div class="row">
+      <a class="btn ghost sm" href="{{ url_for('admin_chat_user', uid=u.id) }}" title="Chat">{{ ic('chat') }}</a>
+      {% for act, label, cls in [('unban' if u.banned else 'ban', 'Unblock' if u.banned else 'Block', 'ghost'), ('demote' if u.role == 'admin' else 'promote', 'Remove admin' if u.role == 'admin' else 'Make admin', 'ghost'), ('resetpw', 'Reset password', 'ghost'), ('regen_key', 'New API key', 'ghost'), ('clear_mail', 'Clear mailbox', 'ghost'), ('delete', 'Delete', 'danger')] %}
+      <form method="post" action="{{ url_for('admin_user_act', uid=u.id, act=act) }}" data-confirm="{{ label }} {{ u.username }}?"><input type="hidden" name="_csrf" value="{{ csrf }}"><button class="btn {{ cls }} sm">{{ label }}</button></form>{% endfor %}
+    </div></td></tr>
+  {% else %}<tr><td colspan="6" class="empty">No users found.</td></tr>{% endfor %}</table></div>
+</div>
+{% endblock %}

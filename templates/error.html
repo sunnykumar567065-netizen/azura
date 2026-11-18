@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% from "macros.html" import ic %}
+{% block body %}<div class="glass center"><h1>{{ e.code }}</h1><p class="mut">{{ e.description }}</p><a class="btn" href="{{ url_for('index') }}">Go home</a></div>{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% from "macros.html" import ic %}
+{% block title %}Chats - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass">
+  <h2>{{ ic('chat') }} User chats</h2>
+  {% for u, last, un in rows %}<a href="{{ url_for('admin_chat_user', uid=u.id) }}" class="kv" style="margin-bottom:8px;color:inherit;text-decoration:none">
+    <b>{{ u.username }}</b><span class="mut sm" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ last.body }}</span>{% if un %}<span class="badge">{{ un }}</span>{% endif %}<span class="mut sm">{{ last.created_at|ist }}</span></a>
+  {% else %}<div class="empty">No conversations yet. Open a user from the Users page to start one.</div>{% endfor %}
+</div>
+{% endblock %}

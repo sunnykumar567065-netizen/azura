@@ -1,0 +1,3 @@
+{% macro ic(n) %}<svg class="ic" aria-hidden="true"><use href="#i-{{ n }}"/></svg>{% endmacro %}
+{% macro pill(s) %}<span class="pill {{ s }}">{{ s }}</span>{% endmacro %}
+{% macro copy(t) %}<button type="button" class="copy" title="Copy" data-copy="{{ t }}">{{ ic('copy') }}</button>{% endmacro %}

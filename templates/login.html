@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% from "macros.html" import ic %}
+{% block title %}Login - {{ site }}{% endblock %}
+{% block body %}
+<div class="glass center">
+  <div class="hero"><div class="logo">{{ ic('lock') }}</div><div><h1>Welcome back</h1><div class="mut">Sign in to your gateway.</div></div></div>
+  <form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}">
+    <label for="u">Username</label><input id="u" name="username" autocomplete="username" required>
+    <label for="p">Password</label><input id="p" name="password" type="password" autocomplete="current-password" required>
+    <button class="btn block" type="submit">{{ ic('lock') }} Sign in</button>
+  </form>
+  <p class="mut sm">New here? <a href="{{ url_for('register') }}">Create an account</a>. You need a referral code from an existing user or from <a href="https://t.me/{{ tg }}" target="_blank" rel="noopener">@{{ tg }}</a>.</p>
+</div>
+{% endblock %}
