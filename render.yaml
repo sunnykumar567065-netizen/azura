@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: azura-pay
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 1 --threads 8 --timeout 90
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: PROD
+        value: "1"
+      - key: SITE_NAME
+        value: Azura Pay
+      - key: TG_CONTACT
+        value: zadosint
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: azura-db
+          property: connectionString
+databases:
+  - name: azura-db
+    plan: free
